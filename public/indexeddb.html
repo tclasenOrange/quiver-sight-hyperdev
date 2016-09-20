@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html> <!--manifest="indexeddb.appcache"-->
   <head>
     <meta charset="utf-8">
     <title>Quiver-Sight</title>
+    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
     <link rel="stylesheet" href="styleeee.css">
   </head>
   <body>
@@ -42,5 +43,20 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="indexdb.js"></script>
+    <script>
+      if(navigator.onLine) {
+        alert("online");
+      } else {
+        alert("offline");
+      }
+      
+      window.addEventListener("offline", function(e){
+        alert("offline");
+      }, false);
+      
+      window.addEventListener("online", function(e){
+        alert("online");
+      }, false);
+    </script>
   </body>
 </html>

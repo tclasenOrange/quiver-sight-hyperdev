@@ -1,13 +1,13 @@
 var db=null;
 window.indexDB = window.indexedDB||window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
-var connectTODB= function(){
+var connectToDB= function(){
   var version=1;
   var request= window.indexedDB.open("quiversight", version);
   request.onupgradeneeded = function(event){
     alert("onUpgradeNeeded fired");
     var db = event.target.result;
-    db.createObjectStore("notes",{keyPath:"id", autoincrement:true});
+    db.createObjectStore("notes",{keyPath:"id", autoIncrement:true});
   };
   request.onsuccess = function(event){
     db=event.target.result;
@@ -51,7 +51,7 @@ var addToNotesList = function(key, data){
 };
 
 $("#notes").click(function(event){
-  var elemtn = $(event.target);
+  var element = $(event.target);
   if(element.is('li')){
     getNote(element.attr("data-id"));
   }
@@ -93,7 +93,7 @@ var newNote = function(){
   var note=$("#note");
   var title = $("#title");
   
-  $("'delete_button").hide();
+  $("#delete_button").hide();
   title.removeAttr("data-id");
   title.val("");
   note.val("");
@@ -115,15 +115,15 @@ $("#save_button").click(function(event){
 });
 
 var insertNote = function(title, note){
-  var data, key;
+  var data, key, transaction, store, request;
   data = {
     "title":title,
-    "note": note,
+    "note": note
   };
   
-  var transaction = db.transaction(["notes"], "readwrite");
-  var store = transaction.objectStore("notes");
-  var request = store.put(data);
+  transaction = db.transaction(["notes"], "readwrite");
+  store = transaction.objectStore("notes");
+  request = store.put(data);
   
   request.onsuccess = function(event){
     key = request.result;
@@ -149,3 +149,47 @@ var updateNote= function(id, title, note){
     $("#notes>li[data-id=" + id + "]").html(title);
   };
 };
+
+$("#delete_button").click(function(event){
+  var title=$("#title");
+  event.preventDefault();
+  deleteNote(title.attr("data-id"));
+});
+
+var deleteNote = function(id){
+  var request, store, transaction;
+  
+  id = parseInt(id);
+  
+  transaction = db.transaction(["notes"], "readwrite");
+  store = transaction.objectStore("notes");
+  request = store.delete(id);
+  
+  request.onsuccess = function(event){
+    $("#notes>li[data-id=" + id + "]").remove();
+    newNote();
+  };
+};
+
+$("#delete_all_button").click(function(id){
+  clearNotes();
+});
+
+var clearNotes = function(id){
+  var request, store, transaction
+  
+  transaction = db.transaction(["notes"], "readwrite");
+  store = transaction.objectStore("notes");
+  request = store.clear();
+  
+  request.onsuccess = function(event){
+    $('#notes').empty();
+  };
+  
+  request.onerror = function(event){
+    alert("Unable to clear things out.");
+  };
+};
+
+connectToDB();
+newNote();
